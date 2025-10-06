@@ -155,20 +155,14 @@
         const copyMessage = document.getElementById('copy-message');
         
         
-        /**
-         * Selecciona un elemento aleatorio de la lista proporcionada.
-         * @param {string[]} list - El array de elementos (emojis, palabras, etc.).
-         * @returns {string} Un elemento aleatorio del array.
-         */
+
         function getRandomElement(list) {
             const index = Math.floor(Math.random() * list.length);
             return list[index];
         }
 
 
-        /**
-         * Genera 3 emojis aleatorios y los muestra en la interfaz.
-         */
+
         function generateRandomEmojis() {
             try {
                 // Se actualizó a getRandomElement
@@ -191,9 +185,6 @@
         }
         
        
-		/**
-         * Genera un Personaje aleatorio (PERSONAJE + PROFESION) y lo muestra.
-         */
         function generateRandomCharacter() {
 			
 
@@ -215,10 +206,7 @@
                 outputElement.textContent = "❌ Error al generar personaje";
             }
         }        
-        
-		/**
-		 * Genera 3 palabras aleatorias únicas y las muestra.
-		 */
+
 		function generate3RandomWords() {
 			try {
 				const selectedWords = [];
@@ -255,9 +243,6 @@
 		}         
 
 
-        /**
-         * Copia el texto de la pantalla al portapapeles y muestra un mensaje de confirmación.
-         */
         function copyEmojisToClipboard() {
             const textToCopy = outputElement.textContent.trim();
 
