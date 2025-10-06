@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Aleatorio de Emojis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .emoji-display {
+            //font-size: 4rem; /* Tamaño grande para los emojis */
+            line-height: 1;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .emoji-display:hover {
+            transform: scale(1.05);
+        }
+        .container-card {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="flex items-start justify-center min-h-screen pt-16"> 
+
+    <div class="container-card">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Coliseo del Cat</h1>
+        
+
+        <div id="emoji-output" class="emoji-display select-text" title="Haz clic para copiar">
+            ✨
+        </div>
+
+        <button id="generate-button"
+            class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 shadow-md transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-green-300">
+            Emojis
+        </button>           
+        
+        <button id="generate-character-button"
+            class="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 shadow-md transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-blue-300">
+            Personaje
+        </button>
+        
+        <button id="generate-3words-button"
+            class="w-full mt-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 shadow-md transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-blue-300">
+            Palabras
+        </button>        
+
+        <div id="copy-message" class="mt-4 text-sm text-green-600 opacity-0 transition-opacity duration-300">
+            ¡Texto copiado!
+        </div>
+        
+        <center>&#169 2025 KokakoSensei</center>
+    </div>
+    
+    
+
+    <script>
+        // Los emojis de WhatsApp son simplemente caracteres Unicode.
+
+        
+	const EMOJI_LIST = [
+		// Caras y Emociones (Smileys & Emotion)
+		"😀", "😅", "😉", "😇", 
+		"😍", "🤪", 
+		"🤔", "🫡", "🤨", "😐", "🙄", 
+		"☹️", "😭",
+		"😡", "😈", "👿", "💀", "☠️", "💩", "🤡", "👻", "👽", "🤖", "😺",
+
+		// Personas y Partes del Cuerpo (People & Body)
+		"🖐️", "✌️", "🤞", "🤟", 
+		"✊", 
+		"🤝", "🙏", "✍️", 
+		"👂", "👃", "🧠", "🫀", "🫁", "🦷", "🦴", "👀", "👁️", "👅", "👄", "👶", 
+		"🫅", "👮", "👷", "💂", "🕵️", "🧑‍🎓", 
+		"🧑‍🍳", "🧑‍🔧", "🧑‍🏭", "🧑‍💼", "🧑‍🔬", 
+		"🧑‍🚒", "🤹", "🧘", "🚶", "🏃", "💃", "🕺", "💑",
+		
+		// Comida y Bebidas (Food & Drink)
+		"🍎", "🍊", "🍋", "🍉", "🍇", "🍓", "🍒", "🍑", "🍍", "🥭", "🥝", "🍅", "🍆", "🥑",
+		"🥦", "🥬", "🥒", "🌶️", "🌽", "🥕", "🥔", "🥐", "🍞", "🥖", "🥨", "🧀", "🥚",
+		"🍳", "🥞", "🥓", "🥩", "🍗", "🍖", "🍕", "🌭", "🍔", "🍟", "🌮", "🌯", "🥗",
+		"🥘", "🍝", "🍜", "🍲", "🍛", "🍣", "🍤", "🍚", "🍙", "🍘", "🍥", "🍡", "🍦",
+		"🍨", "🍩", "🍪", "🎂", "🍰", "🧁", "🥧", "🍫", "🍬", "🍭", "🍮", "🍯", "🍼",
+		"🥛", "☕", "🍵", "🍶", "🍾", "🍷", "🍸", "🍹", "🍺", "🍻", "🥂", "🥃", "🧊",    
+
+		// Animales y Naturaleza (Animals & Nature)
+		"🐒", "🦍", "🦧", "🐶", "🐕", "🐩", "🐺", "🦊", "🦝", "🐱", "🐈", "🦁", "🐯", "🐅",
+		"🐆", "🐴", "🐎", "🦌", "🐮", "🐂", "🐃", "🐄", "🐷", "🐖", "🐗", "🐏", "🐑",
+		"🐐", "🐪", "🐫", "🦙", "🦒", "🐘", "🦣", "🦏", "🦛", "🐭", "🐁", "🐀", "🐹", "🐰",
+		"🐇", "🐿️", "🦫", "🦔", "🦇", "🐻", "🐨", "🐼", "🦥", "🦦", "🦨", "🦘",
+		"🦡", "🐾", "🦃", "🐔", "🐓", "🐣", "🐥", "🐤", "🐦", "🐧", "🕊️", "🦅", "🦆", "🦢",
+		"🦉", "🦩", "🦚", "🦜", "🐸", "🐊", "🐢", "🦎", "🐍", "🐲", "🦕", "🦖", "🐳",
+		"🐋", "🐬", "🦭", "🐟", "🐠", "🐡", "🦈", "🐙", "🐚", "🦀", "🦞", "🦐", "🦑", "🐌",
+		"🦋", "🐛", "🐜", "🐝", "🪲", "🐞", "🦗", "🕷️", "🕸️", "🦂", "🦟", "🪰", "🪱", "🦠",
+		"💐", "🌸", "🌹", "🥀", "🌺", "🌻", "🌼", "🌷", "🌱", "🌲", "🌳", "🌴",
+		"🌵", "🌾", "🍄", "🌎", 
+		"🌙", "⭐", "☄️", "☀️", 
+		"☁️", "🌧️", "⚡", "🔥", "💥", "❄️", "⛄", "🌬️", 
+		"🌪️", "🌈", "☔", "💧", "🌊",
+
+		// Viajes y Lugares (Travel & Places)
+		"🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐", "🚚", "🚛", "🚜", "🛵",
+		"🏍️", "🛺", "🚲", "🛴", "🚏", "🛣️", "🛤️", "🚨", "🚦", "🚧", "⚓", "⛵", "🛶",
+		"🚤", "🚢", "✈️", "🛩️", "🚁", "🚂",
+		"🚪", "🏠", "🏢", "🏰", "🏯", "💒", "🗼",
+		"🗽", "🕌", "🕍", "⛪", "⛩️", "🏔️", "⛰️", "🌋", "🏖️", "🏕️", "🏜️", "🏝️",
+
+		// Actividades (Activities)
+		"🎃", "🎄", "🎅", "⛳", "⛸️", "🎣", "🤿", "🎽","🏂",
+		"🏋️", "🤸", "⛹️", "🤺", "🤼", "🤹", "🎪", "🎭", "🎤", "🎧", "🎨", "🧩", "🎲", "🎯",
+		"🎳", "🎮", "🎰", "🕹️", "🎱", "🪄",
+
+		// Objetos (Objects) 
+		"📲", "📟", "📠", "🎙️", "💻", "🖥️", "🖱️", "💿","💾", "🔑",
+		"🗝️", "🪚", "🪛", "🪠", "🚽", "🪣", "🚿", "🛁", "🧴", "🧷", "🩹", "🩺", "🪞", "🪟", "🚪",
+		"🪜", "🪑", "🛋️", "🛏️", "🛎️", "🛍️", "🛒", "📪", "📫", "📬", "📭", "📮", "🗳️", "✏️",
+		"✒️", "🖋️", "🖊️", "🗒️", "🗓️", "📇", "📋", "📌", 
+		// Objetos (Objects)
+		"⌚", "📱", "⌨️", "🖱️", "🔋", "🔌", "💡", "🔦", "🕯️", "🗑️", "🛢️",
+		"💰", "🪙", "💵", "💸", "💳", "🪪", "✉️", "📦", "📫",
+		"📪", "📬", "📭", "📜", "📃", "📄", "📰", "📖", "📗", "📘", "📙", "📚", "🔖",
+		"🏷️", "🔗", "📎", "✂️", "📏", "📐", "🗓️", "📇", "🗃️", "🗄️", "🔒", "🔐",
+		"🔑", "🗝️", "🔨", "🪓", "⛏️", "🔪", "🗡️", "⚔️", "🛡️", "🚬", "💣", "🔫", "💊", "💉",
+		"🧪", "🔬", "🔭", "📡", "🖨️", "💿", "📀", "🎥", "🎬", "🎤", "🎧", "🎷",
+		"🎸", "🎺", "🎻", "🥁", "🎹", "🖼️", "🎨", "🧵", "🧶", "🪡", "👠", "👢",
+		"👟", "👒", "🎩", "🧢", "⛑️", "🎒", "👜", "💼", "🌂", "☂️", "💍", "💎", "📢", "📣",
+		"🔔", "📯", "🎼", "🎶", "🎵", "🎙️", "📻", "🕰️", "⌛", "⏳", "🎁", "🎈", "🎊", "🎉",
+		"🎏", "🎐", "🎋", "🧧", "🎀", "🪄", "🔮", "🩹", "🩺", "🧱", "🪑", "🚽",
+		"🚿", "🛁", "🧼", "🪥", "🧽", "🧺", "🪚", "🪛", "⚙️", "🔗", "🧲", "🔧", "🧱",    
+
+		// Símbolos (Symbols)
+		"❤️", "💔", 
+		"🚫", "🚭", "📵", 
+
+
+	];        
+
+        
+        const outputElement = document.getElementById('emoji-output');
+        const generateEmojiButton = document.getElementById('generate-button');
+        const generateCharacterButton = document.getElementById('generate-character-button'); 
+        const generate3WordsButton = document.getElementById('generate-3words-button'); // Nuevo botón: SE DEBE AGREGAR LA DECLARACIÓN DE LA CONSTANTE
+        const copyMessage = document.getElementById('copy-message');
+        
+        
+        /**
+         * Selecciona un elemento aleatorio de la lista proporcionada.
+         * @param {string[]} list - El array de elementos (emojis, palabras, etc.).
+         * @returns {string} Un elemento aleatorio del array.
+         */
+        function getRandomElement(list) {
+            const index = Math.floor(Math.random() * list.length);
+            return list[index];
+        }
+
+
+        /**
+         * Genera 3 emojis aleatorios y los muestra en la interfaz.
+         */
+        function generateRandomEmojis() {
+            try {
+                // Se actualizó a getRandomElement
+                const emoji1 = getRandomElement(EMOJI_LIST);
+                const emoji2 = getRandomElement(EMOJI_LIST);
+                const emoji3 = getRandomElement(EMOJI_LIST);
+
+                const combinedEmojis = `${emoji1} ${emoji2} ${emoji3}`;
+                outputElement.textContent = combinedEmojis;
+                outputElement.style.fontSize = '2rem'; // Restaurar tamaño de fuente para emojis
+
+                // Ocultar el mensaje de copiado si estaba visible
+                copyMessage.classList.add('opacity-0');
+                // Se actualizó el mensaje de copiado en el HTML.
+                copyMessage.textContent = '¡Emojis copiados!';
+            } catch (error) {
+                console.error("Error al generar emojis:", error);
+                outputElement.textContent = "❌ Error al cargar emojis";
+            }
+        }
+        
+       
+		/**
+         * Genera un Personaje aleatorio (PERSONAJE + PROFESION) y lo muestra.
+         */
+        function generateRandomCharacter() {
+			
+
+            try {
+				
+					const character = "<b>Personaje:</b> "+getRandomElement(PERSONAJE);
+					const profession = "<b>Profesión:</b> " +getRandomElement(PROFESION);
+					const gender = "<b>Género:</b> " + getRandomElement(["macho", "hembra", "no binario"]);
+					const combinedText = `${character}<br>${profession}<br>${gender}`;
+                              
+                outputElement.innerHTML = combinedText; 
+                outputElement.style.fontSize = '1rem'; // Ajustar tamaño de fuente para texto
+                
+                // Ocultar el mensaje de copiado si estaba visible
+                copyMessage.classList.add('opacity-0');
+                copyMessage.textContent = '¡Texto copiado!';
+            } catch (error) {
+                console.error("Error al generar personaje:", error);
+                outputElement.textContent = "❌ Error al generar personaje";
+            }
+        }        
+        
+		/**
+		 * Genera 3 palabras aleatorias únicas y las muestra.
+		 */
+		function generate3RandomWords() {
+			try {
+				const selectedWords = [];
+				let word1, word2, word3;
+
+				// 1. Generar la primera palabra
+				word1 = getRandomElement(TODO);
+				selectedWords.push(word1);
+
+				// 2. Generar la segunda palabra (debe ser diferente a word1)
+				do {
+					word2 = getRandomElement(TODO);
+				} while (word2 === word1);
+				selectedWords.push(word2);
+
+				// 3. Generar la tercera palabra (debe ser diferente a word1 y word2)
+				do {
+					word3 = getRandomElement(TODO);
+				} while (word3 === word1 || word3 === word2);
+
+				// Combinar el texto con saltos de línea
+				const combinedText = `${word1}<br>${word2}<br>${word3}`;
+
+				outputElement.innerHTML = combinedText;
+				outputElement.style.fontSize = '1rem'; // Ajustar tamaño de fuente para texto
+
+				// Ocultar el mensaje de copiado si estaba visible
+				copyMessage.classList.add('opacity-0');
+				copyMessage.textContent = '¡Texto copiado!';
+			} catch (error) {
+				console.error("Error al generar palabras:", error);
+				outputElement.textContent = "❌ Error al generar palabras";
+			}
+		}         
+
+
+        /**
+         * Copia el texto de la pantalla al portapapeles y muestra un mensaje de confirmación.
+         */
+        function copyEmojisToClipboard() {
+            const textToCopy = outputElement.textContent.trim();
+
+            if (!textToCopy || textToCopy === "✨" || textToCopy.includes("Error")) {
+                // No copiar si el contenido es solo el placeholder o un error.
+                return;
+            }
+
+            // Usamos un método alternativo y simple para copiar texto, compatible con iframes.
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+
+            try {
+                // Ejecuta el comando de copia
+                document.execCommand('copy');
+
+                // Muestra el mensaje de copiado
+                copyMessage.classList.remove('opacity-0');
+                setTimeout(() => {
+                    copyMessage.classList.add('opacity-0');
+                }, 2000); // Oculta después de 2 segundos
+            } catch (err) {
+                console.error('Error al copiar el texto: ', err);
+            }
+
+            document.body.removeChild(tempTextArea);
+        }
+
+        // --- Inicialización y Event Listeners ---
+
+        // Generar el contenido inicial al cargar (cambiado a la función de emojis por defecto)
+        window.onload = () => {
+            generateRandomEmojis();
+            // Asignar eventos de clic
+            generateEmojiButton.addEventListener('click', generateRandomEmojis);
+            generateCharacterButton.addEventListener('click', generateRandomCharacter);
+            generate3WordsButton.addEventListener('click', generate3RandomWords); // <-- LÍNEA AGREGADA
+            outputElement.addEventListener('click', copyEmojisToClipboard);
+
+
+        };
+        
+        
+        
+        
+		//Listado de palabras
+		
+		PERSONAJE=["humano","humano","humano","humano","humano","elfo","orco","ángel","demonio","monstruo","trol","cíclope","ogro","hobbit","enano","gnomo","duende","hada","sirena","dragón","alienígena","unicornio","centauro","grifo","minotauro","quimera","espectro","fantasma","ratón","gato","perro","león","lobo","cordero","tortuga","liebre","zorro","caballo","pato","cisne","cerdo","rana","sapo","pájaro","oso","tigre","elefante","mono","cocodrilo","serpiente","pingüino","hipopótamo","girafa","águila","cebra","hámster","búho","camello","ciervo","koala","mapache","armadillo","tejón","hurón","puma","lagarto","canguro","rinoceronte","oso hormiguero","castor","loro","hiena","marmota","avestruz","mariposa","escarabajo","abeja","hormiga","libélula","mosquito","grillo","avispa","cucaracha","oruga","saltamontes","araña","luciérnaga","polilla","mariquita","mosca","abejorro","cienpiés","tarántula","cigarra","pulga"];
+		
+		PROFESION = ["héroe", "villano", "princesa", "príncipe", "bruja", "mago", "cazador", "explorador", "piloto", "científico", "detective", "médico", "enfermero", "inventor", "ingeniero", "artista", "músico", "actor", "escritor", "reportero", "arquitecto", "cocinero", "jardinero", "agricultor", "pescador", "carpintero", "mecánico", "bombero", "policía", "ladrón", "pirata", "ninja", "samurái", "soldado", "espía", "comerciante", "banquero", "barrendero", "bailarín", "atleta", "profesor", "estudiante", "bibliotecario", "pintor", "fotógrafo", "astronauta", "robot", "veterinario", "zoólogo", "entrenador", "guardaespaldas", "juez", "abogado", "constructor", "electricista", "fontanero", "filósofo", "historiador", "geólogo", "paleontólogo", "arqueólogo", "escultor", "diseñador", "sastre", "bailarina", "astrólogo", "capitán", "taxista", "ingeniero", "diseñador", "youtuber", "guardián", "viajero", "entrenador", "guerrero", "arquero", "paladín", "clérigo", "sacerdote", "alquimista", "vaquero", "comisario", "bandido", "forajido", "jedi", "sith", "aventurero", "boxeador", "karateca", "gimnasta", "futbolista", "empresario", "influencer", "leñador", "dibujante", "pandillero", "cartero", "intendente", "camarero", "payaso", "carnicero", "obrero", "dentista", "contador", "programador", "político"]		
+
+		VERBO=["correr","saltar","volar","luchar","hablar","susurrar","gritar","reír","llorar","pensar","soñar","mirar","escuchar","esconder","descubrir","encontrar","perseguir","escapar","tropezar","caer","levantar","caminar","trolear","enfrentar","viajar","nadar","navegar","vencer","perder","ganar","desafiar","celebrar","despedir","salvar","destruir","crear","imaginar","transformar","cambiar","buscar","enamorar","odiar","disparar","lanzar","capturar","evitar","superar","proteger","atrapar","morder","desaparecer","aparecer","desarmar","armar","viajar en el tiempo","engañar","planear","rescatar","desenterrar","asustar"];
+
+		SENTIMIENTO=["felicidad","tristeza","miedo","ira","sorpresa","amor","odio","alegría","asco","vergüenza","celos","ternura","diversión","preocupación","paz","confusión","entusiasmo","esperanza","ansiedad","emoción","cansancio","desprecio","gratitud","melancolía","confianza","envidia","desesperación","culpa","curiosidad","satisfacción","remordimiento","pánico","orgullo","inspiración","nerviosismo","aburrimiento","agradecimiento","agobio","arrepentimiento","compasión","desdén","empatía","euforia","frustración","intriga","placer"];
+
+		ADJETIVO=["valiente","cobarde","inteligente","tonto","amable","desagradable","generoso","egoísta","optimista","pesimista","audaz","tímido","fuerte","débil","justo","injusto","modesto","presuntuoso","sincero","leal","traidor","compasivo","insensible","trabajador","perezoso","ingenioso","alegre","poderoso","impotente","gracioso","aburrido","resiliente","frágil","aventurero","cauto","seguro","inseguro","encantador","repelente","perseverante","desistente","sabio","necio","elegante","vulgar","antipático","disciplinado","desorganizado","tenaz","caprichoso","sensible","respetuoso","irrespetuoso","amistoso","hostil","comprensivo","incomprensivo","paciente","impaciente","cooperativo","egoísta","astuto","torpe","apasionado","indiferente","calmado","nervioso","sereno","temeroso","desesperanzado","fiable","apacible","agresivo","agradecido","ingrato","sociable","solitario","hábil","repulsivo","magnánimo","mezquino","cauteloso","benevolente","malévolo","considerado"];
+
+		OBJETO = ["manzana", "plátano", "uva", "fresa", "naranja", "zanahoria", "brócoli", "espinaca", "pepino", "calabaza", "sandía", "melón", "cereza", "pera", "ciruela", "tomate", "lechuga", "pimiento", "berenjena", "apio", "limón", "kiwi", "piña", "mango", "papaya", "granada", "frambuesa", "arándano", "mandarina", "cebolla", "ajo", "patata", "calabacín", "chirivía", "repollo", "coliflor", "alcachofa", "guisante", "mora", "higo", "pomelo", "pizza", "hamburguesa", "galletas", "helado", "donas", "refresco", "nachos", "chocolate", "pasteles", "batido", "pretzels", "burrito", "tacos", "cheetos", "doritos", "brownie", "malvaviscos", "cupcakes", "pancakes", "sushi", "ramen", "torta", "churros", "agua", "refresco", "té", "café", "leche", "zumo", "limonada", "batido", "cerveza", "vino", "whisky", "champán", "cacao", "sake", "silla", "mesa", "cama", "sofá", "lámpara", "televisor", "libro", "reloj", "espejo", "alfombra", "cuadro", "cojín", "ventana", "puerta", "armario", "cesto", "cortinas", "taza", "plato", "tenedor", "cuchillo", "cepillo", "esponja", "toalla", "jabón", "computadora", "teclado", "ratón", "laptop", "teléfono", "cargador", "calculadora", "lápiz", "cuaderno", "papel", "pluma", "gafas", "jarrón", "vela", "pupitre", "libro", "cuaderno", "bolígrafo", "lápiz", "goma", "sacapuntas", "mochila", "pizarra", "calculadora", "papel", "pegamento", "tijeras", "profesor", "estudiante", "marcadores", "computadora", "proyector", "mapa", "reloj", "timbre", "escritorio", "bandera", "balón", "uniforme", "espada", "corona", "llave", "amuleto", "anillo", "brújula", "lupa", "mapa", "tesoro", "tintero", "pluma", "poción", "bastón", "caldero", "zapatos", "collar", "llave", "escalera", "antorcha", "candelabro", "carroza", "barco", "bicicleta", "motocicleta", "camión", "patineta", "carruaje", "cohete", "balsa", "patines", "submarino", "barco", "camioneta", "avión", "helicóptero", "lancha", "tobogán", "autobús", "ferrocarril"];
+			
+		SENTIMIENTOSEXTRA=["abandono","abatimiento","abrumación","aflicción","agitación","agobio","agonía","aislamiento","amargura","apatía","arrepentimiento","ausencia","banalidad","congoja","consternación","contrariedad","contrición","culpa","decaimiento","decepción","dependencia","depresión","derrota","desaliento","desamor","desamparo","desánimo","desaprobación","desconsuelo","descontento","desdén","desdicha","desencanto","desengaño","desesperanza","desgano","desidia","desilusión","desmotivación","desolación","desprestigio","desvalorización","desventura","devaluación","disforia","dolor","duelo","estancamiento","exclusión","fracaso","humillación","incapacidad","incomprensión","indiferencia","inexpresividad","infelicidad","lástima","malestar","melancolía","menosprecio","necesidad","neutralidad","nostalgia","pena","perdición","pesadumbre","pesar","pesimismo","remordimiento","resignación","soledad","sufrimiento","suplicio","tormento","turbación","vacío","alborozo","alivio","ánimo","añoranza","apaciguamiento","arrojo","asertividad","autenticidad","autocomplacencia","autonomía","bienaventuranza","brillantez","brío","calma","certeza","comodidad","complacencia","contemplación","contento","deleite","despreocupación","dicha","dignidad","disfrute","diversión","ecuanimidad","empoderamiento","encanto","entusiasmo","esperanza","euforia","exaltación","excitación","éxito","éxtasis","fascinación","felicidad","fervor","firmeza","frenesí","gozo","grandeza","gusto","ilusión","imperturbabilidad","inspiración","intrepidez","jocosidad","jolgorio","jovialidad","júbilo","libertad","logro","lujuria","motivación","omnipotencia","optimismo","osadía","ostentación","pasión","placer","placidez","plenitud","regocijo","revulsión","satisfacción","solemnidad","sosiego","suficiencia","tranquilidad","triunfo","valentía","vehemencia","vigor","vivacidad","abuso","agravio","agresividad","arrogancia","aspereza","barbaridad","beligerancia","bravura","brutalidad","burla","celo","cólera","coraje","desconsideración","desesperación","despecho","destrucción","discordia","disgusto","displicencia","dominación","enajenamiento","engaño","engreimiento","enjuiciamiento","enojo","envidia","estrés","exasperación","fastidio","ferocidad","frustración","furia","hosquedad","hostilidad","impaciencia","impotencia","incomodidad","inconformidad","indignación","injusticia","insatisfacción","insulto","invasión","ira","irritabilidad","malhumor","manipulación","molestia","obligación","obstinación","odio","orgullo","pedantería","petulancia","prepotencia","rabia","rebeldía","recelo","rencor","represión","resentimiento","superioridad","traición","ultranza","venganza","violencia","aceptación","acompañamiento","admiración","adoración","afecto","agradecimiento","agrado","amabilidad","apego","apoyo","aprobación","armonía","atracción","benevolencia","bondad","capricho","cariño","cercanía","compasión","comprensión","compromiso","condescendencia","condolencia","confianza","conmiseración","consideración","consolación","consuelo","cordialidad","correspondencia","cuidado","deseo","dulzura","embelesamiento","empatía","enamoramiento","estima","fortaleza","generosidad","gratitud","heroísmo","honestidad","honorabilidad","humildad","integridad","interés","intimidad","introspección","justicia","paciencia","paz","pertenencia","receptividad","respeto","seguridad","sensibilidad","sensualidad","sentimentalismo","serenidad","simpatía","solidaridad","solitud","templanza","tenacidad","ternura","tolerancia","unidad","valoración","achicamiento","acobardamiento","acoquinamiento","alarma","amilanamiento","angustia","ansiedad","apocamiento","aprensión","canguelo","cautela","circunspección","cobardía","desasosiego","desconfianza","desprotección","desvalimiento","escrupulosidad","espanto","fobia","fragilidad","horror","impasibilidad","indefensión","inestabilidad","inferioridad","inquietud","inseguridad","insignificancia","insuficiencia","intimidación","intranquilidad","medrosidad","mezquindad","mortificación","nerviosismo","pánico","parálisis","pavidez","pavor","perturbación","preocupación","prevención","pudor","pusilanimidad","reserva","resquemor","sometimiento","sumisión","suspicacia","susto","temor","terror","timidez","vergüenza","victimismo","vigilancia","vulnerabilidad","alteración","ambivalencia","anormalidad","arrobamiento","asombro","aturdimiento","confusión","conmoción","curiosidad","desapercibimiento","desconcierto","deslumbramiento","desorientación","disonancia","distracción","duda","emergencia","escepticismo","estremecimiento","estupefacción","estupor","expectación","extrañeza","extraordinario","extravagancia","ilógico","impacto","impresión","imprevisión","inadvertencia","inaudito","incoherencia","incongruencia","incredulidad","increíble","indecisión","inesperado","insólito","insospechado","intempestivo","intriga","irreal","irreflexión","maravilla","obnubilación","pasmo","peculiaridad","perplejidad","prodigio","rareza","revelador","shock","sobresalto","traumático","titubeo","urgencia","vacilación","abominable","aborrecimiento","abstinencia","alejamiento","animadversión","antagonismo","antipatía","apartamiento","aversión","censura","contención","continencia","desafecto","desapego","desagrado","desavenencia","desazón","desdeño","desprecio","destitución","discrepancia","discriminación","disentimiento","distanciamiento","divergencia","eliminación","emético","empacho","empalago","evasión","evitación","execración","grima","hastío","inadecuación","inapetencia","incompatibilidad","inadmisión","inmoralidad","inmundicia","inquina","intolerancia","mesura","moderación","náusea","nocividad","obscenidad","oposición","rechazo","remoción","renuencia","renuncia","repudio","repugnancia","repulsión","separación","sobriedad","tirria","toxicidad","vomitivo"];
+
+        ESCENARIO = ["bosque", "castillo", "ciudad", "cueva", "desierto", "espacio", "isla", "montaña", "océano", "selva", "espacio", "valle", "volcán", "ciudad", "aldea", "sótano", "prisión", "laberinto", "pueblo", "fábrica", "inframundo", "refugio",  "estadio", "teatro", "cine", "zoológico", "fortaleza", "palacio", "mercado", "jardín", "catedral", "aeropuerto", "carnaval", "circo", "hospital", "cafetería", "jungla", "pantano", "escondite", "granja", "tundra", "tecnópolis", "rancho", "teatro", "faro", "biblioteca"];		
+			
+		TODO = [].concat(PERSONAJE,OBJETO,PROFESION,SENTIMIENTO,VERBO,ADJETIVO,ESCENARIO);
+		
+        
+    </script>
+</body>
+</html>
